@@ -40,7 +40,6 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class MusicControlModule extends ReactContextBaseJavaModule implements ComponentCallbacks2 {
     private static final String TAG = MusicControlModule.class.getSimpleName();
@@ -395,7 +394,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
             boolean localArtwork = false;
 
             if(metadata.getType("artwork") == ReadableType.Map) {
-                artwork = Objects.requireNonNull(metadata.getMap("artwork")).getString("uri");
+                metadata.getMap("artwork").getString("uri");
                 localArtwork = true;
             } else {
                 artwork = metadata.getString("artwork");
