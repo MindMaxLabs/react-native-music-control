@@ -234,7 +234,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     }
 
     // Create the service connection.
-    private ServiceConnection connection = new ServiceConnection()
+    private final ServiceConnection connection = new ServiceConnection()
     {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service)
@@ -377,10 +377,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         md.putText(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, description);
         md.putText(MediaMetadataCompat.METADATA_KEY_DATE, date);
         md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
-
-        if (android.os.Build.VERSION.SDK_INT > 19) {
-            md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, rating);
-        }
+        md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, rating);
 
         nb.setContentTitle(title);
         nb.setContentText(artist);
@@ -397,7 +394,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
             boolean localArtwork = false;
 
             if(metadata.getType("artwork") == ReadableType.Map) {
-                artwork = metadata.getMap("artwork").getString("uri");
+                artwork = Objects.requireNonNull(metadata.getMap("artwork")).getString("uri");
                 localArtwork = true;
             } else {
                 artwork = metadata.getString("artwork");
