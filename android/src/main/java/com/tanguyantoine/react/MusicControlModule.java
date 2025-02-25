@@ -517,8 +517,8 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         init();
 
         if (notification == null) {
-            return
-        };
+            return;
+        }
 
         long controlValue;
         switch(control) {
