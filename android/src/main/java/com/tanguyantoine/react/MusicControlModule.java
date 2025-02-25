@@ -157,8 +157,8 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     public void init() {
         if (init) {
-            return
-        };
+            return;
+        }
 
         INSTANCE = this;
 
