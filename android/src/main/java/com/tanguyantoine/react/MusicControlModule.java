@@ -156,7 +156,9 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     }
 
     public void init() {
-        if (init) return;
+        if (init) {
+            return
+        };
 
         INSTANCE = this;
 
@@ -202,6 +204,12 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         filter.addAction(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
         receiver = new MusicControlReceiver(this, context);
         context.registerReceiver(receiver, filter);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(receiver, filter, Context.RECEIVER_EXPORTED);
+        } else {
+            context.registerReceiver(receiver, filter);
+        }
 
         Intent myIntent = new Intent(context, MusicControlNotification.NotificationService.class);
 
@@ -313,8 +321,10 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     @ReactMethod
     public void observeAudioInterruptions(boolean enable) {
         if (enable) {
+            init();
+
             afListener.requestAudioFocus();
-        } else {
+        } else if (afListener != null) {
             afListener.abandonAudioFocus();
         }
     }
@@ -322,8 +332,15 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     @ReactMethod
     synchronized public void setNowPlaying(ReadableMap metadata) {
         init();
-        if (notification == null) return;
-        if(artworkThread != null && artworkThread.isAlive()) artworkThread.interrupt();
+
+        if (notification == null) {
+            return;
+        }
+
+        if(artworkThread != null && artworkThread.isAlive()) {
+            artworkThread.interrupt();
+        }
+
         artworkThread = null;
 
         md = new MediaMetadataCompat.Builder();
@@ -340,7 +357,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         String notificationIcon = metadata.hasKey("notificationIcon") ? metadata.getString("notificationIcon") : null;
 
         RatingCompat rating;
-        if(metadata.hasKey("rating")) {
+        if (metadata.hasKey("rating")) {
             if(ratingType == RatingCompat.RATING_PERCENTAGE) {
                 rating = RatingCompat.newPercentageRating((float)metadata.getDouble("rating"));
             } else if(ratingType == RatingCompat.RATING_HEART) {
@@ -361,6 +378,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         md.putText(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION, description);
         md.putText(MediaMetadataCompat.METADATA_KEY_DATE, date);
         md.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration);
+
         if (android.os.Build.VERSION.SDK_INT > 19) {
             md.putRating(MediaMetadataCompat.METADATA_KEY_RATING, rating);
         }
@@ -447,7 +465,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
             speed = 1;
         }
 
-        if(info.hasKey("elapsedTime")) {
+        if (info.hasKey("elapsedTime")) {
             elapsedTime = (long)(info.getDouble("elapsedTime") * 1000);
             updateTime = SystemClock.elapsedRealtime();
         } else {
@@ -466,7 +484,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
         session.setRatingType(ratingType);
 
-        if(remoteVolume) {
+        if (remoteVolume) {
             session.setPlaybackToRemote(volume.create(null, maxVol, vol));
         } else {
             session.setPlaybackToLocal(AudioManager.STREAM_MUSIC);
@@ -475,20 +493,32 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     @ReactMethod
     synchronized public void resetNowPlaying() {
-        if(!init) return;
-        if(artworkThread != null && artworkThread.isAlive()) artworkThread.interrupt();
+        if (!init) {
+            return;
+        }
+
+        if (artworkThread != null && artworkThread.isAlive()) { 
+            artworkThread.interrupt();
+        }
+
         artworkThread = null;
 
         md = new MediaMetadataCompat.Builder();
 
-        if (notification != null) notification.hide();
+        if (notification != null) {
+            notification.hide();
+        }
+
         session.setActive(false);
     }
 
     @ReactMethod
     synchronized public void enableControl(String control, boolean enable, ReadableMap options) {
         init();
-        if (notification == null) return;
+
+        if (notification == null) {
+            return
+        };
 
         long controlValue;
         switch(control) {
