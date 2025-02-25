@@ -40,6 +40,7 @@ import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 
 public class MusicControlModule extends ReactContextBaseJavaModule implements ComponentCallbacks2 {
     private static final String TAG = MusicControlModule.class.getSimpleName();
