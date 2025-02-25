@@ -1,8 +1,5 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.tanguyantoine.react">
-
-    <application>
-        <service android:stopWithTask="true" android:name=".MusicControlNotification$NotificationService" android:foregroundServiceType="mediaPlayback" />
-    </application>
-
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.tanguyantoine.react">
+  <application>
+    <service android:stopWithTask="true" android:name=".MusicControlNotification$NotificationService" android:exported="true" android:foregroundServiceType="mediaPlayback|dataSync" />
+  </application>
 </manifest>

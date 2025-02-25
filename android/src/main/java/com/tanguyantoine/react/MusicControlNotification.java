@@ -214,13 +214,14 @@ public class MusicControlNotification {
                 // startForeground method should be called within 5 seconds.
                 ContextCompat.startForegroundService(MusicControlNotification.NotificationService.this, intent);
 
-                if(MusicControlModule.INSTANCE == null){
+                if (MusicControlModule.INSTANCE == null) {
                     try {
                         MusicControlModule.INSTANCE.init();
-                    }catch (Exception ex){
+                    } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 }
+
                 try {
                     notification = MusicControlModule.INSTANCE.notification.prepareNotification(MusicControlModule.INSTANCE.nb, false);
                     // call startForeground just after startForegroundService.
