@@ -10,6 +10,7 @@
 
 @property (nonatomic, copy) NSString *artworkUrl;
 @property (nonatomic, assign) BOOL audioInterruptionsObserved;
+@property (nonatomic, assign) BOOL isReceivingRemoteControlEvents;
 
 @end
 
@@ -114,6 +115,10 @@ RCT_EXPORT_METHOD(setNowPlaying:(NSDictionary *) details)
     MPNowPlayingInfoCenter *center = [MPNowPlayingInfoCenter defaultCenter];
     NSMutableDictionary *mediaDict = [NSMutableDictionary dictionary];
 
+    if (!self.isReceivingRemoteControlEvents) {
+      [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
+      self.isReceivingRemoteControlEvents = true;
+    }
 
     center.nowPlayingInfo = [self update:mediaDict with:details andSetDefaults:true];
 
@@ -126,6 +131,8 @@ RCT_EXPORT_METHOD(resetNowPlaying)
     MPNowPlayingInfoCenter *center = [MPNowPlayingInfoCenter defaultCenter];
     center.nowPlayingInfo = nil;
     self.artworkUrl = nil;
+    self.isReceivingRemoteControlEvents = false;
+    [[UIApplication sharedApplication] endReceivingRemoteControlEvents];
 }
 
 RCT_EXPORT_METHOD(enableControl:(NSString *) controlName enabled:(BOOL) enabled options:(NSDictionary *)options)
@@ -226,8 +233,8 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
 - (id)init {
     self = [super init];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(audioHardwareRouteChanged:) name:AVAudioSessionRouteChangeNotification object:nil];
-    [[UIApplication sharedApplication] beginReceivingRemoteControlEvents];
     self.audioInterruptionsObserved = false;
+    self.isReceivingRemoteControlEvents = false;
     return self;
 }
 
