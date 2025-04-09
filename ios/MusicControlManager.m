@@ -412,29 +412,62 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
 }
 
 - (void)audioHardwareRouteChanged:(NSNotification *)notification {
-    NSInteger routeChangeReason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] integerValue];
-    if (routeChangeReason == AVAudioSessionRouteChangeReasonOldDeviceUnavailable) {
-        //headphones unplugged or bluetooth device disconnected, iOS will pause audio
-        [self sendEvent:@"pause"];
-    }
+  NSInteger routeChangeReason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] integerValue];
+  NSString *reasonStr;
+
+  switch (routeChangeReason) {
+    case AVAudioSessionRouteChangeReasonUnknown:
+      reasonStr = @"Unknown";
+      break;
+    case AVAudioSessionRouteChangeReasonOverride:
+      reasonStr = @"Override";
+      break;
+    case AVAudioSessionRouteChangeReasonCategoryChange:
+      reasonStr = @"CategoryChange";
+      break;
+    case AVAudioSessionRouteChangeReasonWakeFromSleep:
+      reasonStr = @"WakeFromSleep";
+      break;
+    case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
+      reasonStr = @"NewDeviceAvailable";
+      break;
+    case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
+      reasonStr = @"OldDeviceUnavailable";
+      break;
+    case AVAudioSessionRouteChangeReasonRouteConfigurationChange:
+      reasonStr = @"ConfigurationChange";
+      break;
+    case AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory:
+      reasonStr = @"NoSuitableRouteForCategory";
+      break;
+    default:
+      reasonStr = @"DoubleUnknown";
+      break;
+  }
+
+  [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"routeChange", @"value": @{@"reason": reasonStr}}];
+
 }
 
 - (void)audioInterrupted:(NSNotification *)notification {
-    if (!self.audioInterruptionsObserved) {
-        return;
-    }
-    NSInteger interruptionType = [notification.userInfo[AVAudioSessionInterruptionTypeKey] integerValue];
-    NSInteger interruptionOption = [notification.userInfo[AVAudioSessionInterruptionOptionKey] integerValue];
-    bool delayedSuspendedNotification = (@available(iOS 10.0, *)) && [notification.userInfo[AVAudioSessionInterruptionWasSuspendedKey] boolValue];
+  if (!self.audioInterruptionsObserved) {
+      return;
+  }
 
-    if (interruptionType == AVAudioSessionInterruptionTypeBegan && !delayedSuspendedNotification) {
-        // Playback interrupted by an incoming phone call.
-        [self sendEvent:@"pause"];
-    }
-    if (interruptionType == AVAudioSessionInterruptionTypeEnded &&
-           interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
-        [self sendEvent:@"play"];
-    }
+  NSInteger interruptionType = [notification.userInfo[AVAudioSessionInterruptionTypeKey] integerValue];
+  NSInteger interruptionOption = [notification.userInfo[AVAudioSessionInterruptionOptionKey] integerValue];
+
+  if (interruptionType == AVAudioSessionInterruptionTypeBegan) {
+    [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"interruption", @"value": @{@"type": @"began", @"shouldResume": @"false"}}];
+    return;
+  }
+
+  if (interruptionOption == AVAudioSessionInterruptionOptionShouldResume) {
+    [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"interruption", @"value": @{@"type": @"ended", @"shouldResume": @"true"}}];
+    return;
+  }
+
+  [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"interruption", @"value": @{@"type": @"ended", @"shouldResume": @"false"}}];
 }
 
 @end

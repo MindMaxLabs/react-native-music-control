@@ -15,5 +15,7 @@ export declare enum Command {
     skipForward = "skipForward",
     skipBackward = "skipBackward",
     changePlaybackPosition = "changePlaybackPosition",
-    closeNotification = "closeNotification"
+    closeNotification = "closeNotification",
+    routeChange = "routeChange",
+    interruption = "interruption"
 }
