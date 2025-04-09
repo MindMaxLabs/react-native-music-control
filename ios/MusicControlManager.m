@@ -426,7 +426,7 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
       reasonStr = @"CategoryChange";
       break;
     case AVAudioSessionRouteChangeReasonWakeFromSleep:
-      reasonStr = @"WakeFormSleep";
+      reasonStr = @"WakeFromSleep";
       break;
     case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
       reasonStr = @"NewDeviceAvailable";
