@@ -18,6 +18,7 @@ export enum Command {
   closeNotification = "closeNotification",
   routeChange = "routeChange",
   interruption = "interruption",
+  outputVolume = "outputVolume",
 }
 
 export type IOSMode =

@@ -17,5 +17,14 @@ export declare enum Command {
     changePlaybackPosition = "changePlaybackPosition",
     closeNotification = "closeNotification",
     routeChange = "routeChange",
-    interruption = "interruption"
+    interruption = "interruption",
+    outputVolume = "outputVolume"
+}
+export declare type IOSMode = "default" | "gameChat" | "measurement" | "moviePlayback" | "spokenAudio" | "videoChat" | "videoRecording" | "voiceChat" | "voicePrompt";
+export declare type IOSCategory = "ambient" | "multiRoute" | "playAndRecord" | "playback" | "record" | "soloAmbient";
+export declare type IOSCategoryOption = "mixWithOthers" | "duckOthers" | "interruptSpokenAudioAndMixWithOthers" | "allowBluetooth" | "allowBluetoothA2DP" | "allowAirPlay" | "defaultToSpeaker" | "overrideMutedMicrophoneInterruption";
+export interface AudioSessionOptions {
+    iosMode: IOSMode;
+    iosCategory: IOSCategory;
+    iosCategoryOptions: IOSCategoryOption[];
 }

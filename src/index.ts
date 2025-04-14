@@ -110,6 +110,12 @@ const MusicControl = {
   setAudioSessionOptions: function (options: AudioSessionOptions): void {
     NativeMusicControl.setAudioSessionOptions(options);
   },
+  observeOutputVolume: function (enable: boolean): void {
+    NativeMusicControl.observeOutputVolume(enable);
+  },
+  getOutputVolume: function (): Promise<number> {
+    return NativeMusicControl.getOutputVolume();
+  },
 };
 
 export default MusicControl;
