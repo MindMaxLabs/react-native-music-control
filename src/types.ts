@@ -19,3 +19,38 @@ export enum Command {
   routeChange = "routeChange",
   interruption = "interruption",
 }
+
+export type IOSMode =
+  | "default"
+  | "gameChat"
+  | "measurement"
+  | "moviePlayback"
+  | "spokenAudio"
+  | "videoChat"
+  | "videoRecording"
+  | "voiceChat"
+  | "voicePrompt";
+
+export type IOSCategory =
+  | "ambient"
+  | "multiRoute"
+  | "playAndRecord"
+  | "playback"
+  | "record"
+  | "soloAmbient";
+
+export type IOSCategoryOption =
+  | "mixWithOthers"
+  | "duckOthers"
+  | "interruptSpokenAudioAndMixWithOthers"
+  | "allowBluetooth"
+  | "allowBluetoothA2DP"
+  | "allowAirPlay"
+  | "defaultToSpeaker"
+  | "overrideMutedMicrophoneInterruption";
+
+export interface AudioSessionOptions {
+  iosMode: IOSMode;
+  iosCategory: IOSCategory;
+  iosCategoryOptions: IOSCategoryOption[];
+}

@@ -2,20 +2,25 @@
  * @providesModule MusicControl
  */
 // @ts-ignore
-import { NativeModules, DeviceEventEmitter, NativeEventEmitter, Platform } from 'react-native'
+import {
+  NativeModules,
+  DeviceEventEmitter,
+  NativeEventEmitter,
+  Platform,
+} from "react-native";
 // @ts-ignore
-import resolveAssetSource from 'react-native/Libraries/Image/resolveAssetSource'
+import resolveAssetSource from "react-native/Libraries/Image/resolveAssetSource";
 // @ts-ignore
-import constants from './constants'
-import { Command } from './types'
+import constants from "./constants";
+import { Command, AudioSessionOptions } from "./types";
 
-export { Command }
+export { Command, AudioSessionOptions };
 
-const NativeMusicControl = NativeModules.MusicControlManager
-let handlers: { [key in Command]?: (value: any) => void } = {}
-let listenerOfNativeMusicControl: any = null
-const IS_ANDROID = Platform.OS === 'android'
-type TPlayingInfo = any
+const NativeMusicControl = NativeModules.MusicControlManager;
+let handlers: { [key in Command]?: (value: any) => void } = {};
+let listenerOfNativeMusicControl: any = null;
+const IS_ANDROID = Platform.OS === "android";
+type TPlayingInfo = any;
 
 const MusicControl = {
   STATE_PLAYING: constants.STATE_PLAYING,
@@ -31,73 +36,80 @@ const MusicControl = {
   RATING_5_STARS: constants.RATING_5_STARS,
   RATING_PERCENTAGE: constants.RATING_PERCENTAGE,
 
-  enableBackgroundMode: function(enable: boolean) {
-    NativeMusicControl.enableBackgroundMode(enable)
+  enableBackgroundMode: function (enable: boolean) {
+    NativeMusicControl.enableBackgroundMode(enable);
   },
-  setNowPlaying: function(info: TPlayingInfo) {
+  setNowPlaying: function (info: TPlayingInfo) {
     // Check if we have an android asset from react style image require
     if (info.artwork) {
-      info.artwork = resolveAssetSource(info.artwork) || info.artwork
+      info.artwork = resolveAssetSource(info.artwork) || info.artwork;
     }
 
-    NativeMusicControl.setNowPlaying(info)
+    NativeMusicControl.setNowPlaying(info);
   },
-  setPlayback: function(info: TPlayingInfo): void {
+  setPlayback: function (info: TPlayingInfo): void {
     // Backwards compatibility. Use updatePlayback instead.
-    NativeMusicControl.updatePlayback(info)
+    NativeMusicControl.updatePlayback(info);
   },
-  updatePlayback: function(info: TPlayingInfo): void {
-    NativeMusicControl.updatePlayback(info)
+  updatePlayback: function (info: TPlayingInfo): void {
+    NativeMusicControl.updatePlayback(info);
   },
-  resetNowPlaying: function() {
-    NativeMusicControl.resetNowPlaying()
+  resetNowPlaying: function () {
+    NativeMusicControl.resetNowPlaying();
   },
-  enableControl: function(controlName: string, enable: boolean, options = {}) {
-    NativeMusicControl.enableControl(controlName, enable, options || {})
+  enableControl: function (controlName: string, enable: boolean, options = {}) {
+    NativeMusicControl.enableControl(controlName, enable, options || {});
   },
-  handleCommand: function(commandName: Command, value: any) {
+  handleCommand: function (commandName: Command, value: any) {
     if (handlers[commandName]) {
       //@ts-ignore
-      handlers[commandName](value)
+      handlers[commandName](value);
     }
   },
   setNotificationId: function (notificationId: any, channelId: any) {
-      if (IS_ANDROID) {
-          NativeMusicControl.setNotificationIds(notificationId, channelId);
-      }
-  },   
-  on: function(actionName: Command, cb: (value: any) => void) {
+    if (IS_ANDROID) {
+      NativeMusicControl.setNotificationIds(notificationId, channelId);
+    }
+  },
+  on: function (actionName: Command, cb: (value: any) => void) {
     if (!listenerOfNativeMusicControl) {
-      listenerOfNativeMusicControl = (IS_ANDROID
-        ? DeviceEventEmitter
-        : new NativeEventEmitter(NativeMusicControl)
-      ).addListener('RNMusicControlEvent', event => {
-        MusicControl.handleCommand(event.name, event.value)
-      })
+      listenerOfNativeMusicControl = (
+        IS_ANDROID
+          ? DeviceEventEmitter
+          : new NativeEventEmitter(NativeMusicControl)
+      ).addListener("RNMusicControlEvent", (event) => {
+        MusicControl.handleCommand(event.name, event.value);
+      });
     }
-    handlers[actionName] = cb
+    handlers[actionName] = cb;
   },
-  off: function(actionName: Command): void {
-    delete handlers[actionName]
+  off: function (actionName: Command): void {
+    delete handlers[actionName];
     if (!Object.keys(handlers).length && listenerOfNativeMusicControl) {
-      listenerOfNativeMusicControl.remove()
-      listenerOfNativeMusicControl = null
+      listenerOfNativeMusicControl.remove();
+      listenerOfNativeMusicControl = null;
     }
   },
-  stopControl: function(): void {
+  stopControl: function (): void {
     if (listenerOfNativeMusicControl) {
-      listenerOfNativeMusicControl.remove()
-      listenerOfNativeMusicControl = null
+      listenerOfNativeMusicControl.remove();
+      listenerOfNativeMusicControl = null;
     }
-    Object.keys(handlers).map(key => {
+    Object.keys(handlers).map((key) => {
       //@ts-ignore
-      delete handlers[key]
-    })
-    NativeMusicControl.stopControl()
+      delete handlers[key];
+    });
+    NativeMusicControl.stopControl();
   },
-  handleAudioInterruptions: function(enable: boolean): void {
-    NativeMusicControl.observeAudioInterruptions(enable)
-  }
-}
+  handleAudioInterruptions: function (enable: boolean): void {
+    NativeMusicControl.observeAudioInterruptions(enable);
+  },
+  setAudioSessionActivity: function (enable: boolean): void {
+    NativeMusicControl.setAudioSessionActivity(enable);
+  },
+  setAudioSessionOptions: function (options: AudioSessionOptions): void {
+    NativeMusicControl.setAudioSessionOptions(options);
+  },
+};
 
-export default MusicControl
+export default MusicControl;

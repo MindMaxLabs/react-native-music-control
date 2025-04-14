@@ -6,6 +6,8 @@
 
 @import MediaPlayer;
 
+static NSString *MusicControlObservationContext = @"MusicControlObservationContext";
+
 @interface MusicControlManager ()
 
 @property (nonatomic, copy) NSString *artworkUrl;
@@ -183,8 +185,80 @@ RCT_EXPORT_METHOD(enableControl:(NSString *) controlName enabled:(BOOL) enabled 
     }
 }
 
-/* We need to set the category to allow remote control etc... */
+RCT_EXPORT_METHOD(setAudioSessionActivity:(BOOL) enabled)
+{
+  NSError *error;
+  AVAudioSession *audioSession = [AVAudioSession sharedInstance];
 
+  NSLog(@"[MusicControlManager] Setting audio session as: %@", enabled ? @"active" : @"inactive");
+  [audioSession setActive:enabled error:&error];
+}
+
+RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options)
+{
+  NSString *modeStr = options[@"iosMode"];
+  NSString *categoryStr = options[@"iosCategory"];
+  NSArray *categoryOptions = @[options[@"iosCategoryOptions"]];
+
+  NSLog(@"Setting audio session options as %@, %@, %@", categoryStr, modeStr, categoryOptions);
+
+  AVAudioSessionMode desiredMode = [self parseMode:modeStr];
+  AVAudioSessionCategory desiredCategory = [self parseCategory:categoryStr];
+  AVAudioSessionCategoryOptions desiredOptions = 0;
+
+  for (id categoryOption in categoryOptions) {
+    desiredOptions |= [self parseCategoryOption:categoryOption];
+  }
+
+  NSError *error;
+  AVAudioSession *audioSession = [AVAudioSession sharedInstance];
+
+  [audioSession setCategory:desiredCategory mode:desiredMode options:desiredOptions error:&error];
+}
+
+RCT_EXPORT_METHOD(observeOutputVolume:(BOOL) enabled) {
+  if (enabled) {
+    if ([self isObservingOutputVolume]) {
+      return;
+    }
+
+    [[AVAudioSession sharedInstance] setActive:YES error:nil];
+
+    [[AVAudioSession sharedInstance] addObserver:self
+                                      forKeyPath:@"outputVolume"
+                                         options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld
+                                         context:(void*)&MusicControlObservationContext];
+    self.isObservingOutputVolume = true;
+
+    NSNumber *volume = [NSNumber numberWithDouble: [[AVAudioSession sharedInstance] outputVolume]];
+    [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"outputVolume", @"value": volume}];
+  } else {
+    if (![self isObservingOutputVolume]) {
+      return;
+    }
+
+    [[AVAudioSession sharedInstance] removeObserver:self forKeyPath:@"outputVolume" context:nil];
+    self.isObservingOutputVolume = false;
+  }
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getOutputVolume) {
+  return [NSNumber numberWithDouble: [[AVAudioSession sharedInstance] outputVolume]];
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context {
+  NSLog(@"observeValueForKeyPath: %@", keyPath);
+  if ([keyPath isEqualToString: @"outputVolume"] && context == &MusicControlObservationContext) {
+
+    NSNumber *volume = [NSNumber numberWithFloat: [change[@"new"] floatValue]];
+    [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"outputVolume", @"value": volume}];
+  }
+}
+
+/* We need to set the category to allow remote control etc... */
 RCT_EXPORT_METHOD(enableBackgroundMode:(BOOL) enabled){}
 
 RCT_EXPORT_METHOD(stopControl){
@@ -415,15 +489,29 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
   NSInteger routeChangeReason = [notification.userInfo[AVAudioSessionRouteChangeReasonKey] integerValue];
   NSString *reasonStr;
 
+  if (routeChangeReason == AVAudioSessionRouteChangeReasonCategoryChange) {
+    reasonStr = @"CategoryChange";
+    NSString *category = [[AVAudioSession sharedInstance] category];
+    NSString *mode = [[AVAudioSession sharedInstance] mode];
+
+    [self sendEventWithName:@"RNMusicControlEvent"
+                       body:@{
+      @"name": @"routeChange",
+      @"value": @{
+        @"reason": reasonStr,
+        @"iosCategory": category,
+        @"iosMode": mode
+      }
+    }];
+    return;
+  }
+
   switch (routeChangeReason) {
     case AVAudioSessionRouteChangeReasonUnknown:
       reasonStr = @"Unknown";
       break;
     case AVAudioSessionRouteChangeReasonOverride:
       reasonStr = @"Override";
-      break;
-    case AVAudioSessionRouteChangeReasonCategoryChange:
-      reasonStr = @"CategoryChange";
       break;
     case AVAudioSessionRouteChangeReasonWakeFromSleep:
       reasonStr = @"WakeFromSleep";
@@ -446,7 +534,6 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
   }
 
   [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"routeChange", @"value": @{@"reason": reasonStr}}];
-
 }
 
 - (void)audioInterrupted:(NSNotification *)notification {
@@ -468,6 +555,110 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
   }
 
   [self sendEventWithName:@"RNMusicControlEvent" body:@{@"name": @"interruption", @"value": @{@"type": @"ended", @"shouldResume": @"false"}}];
+}
+
+- (AVAudioSessionMode) parseMode:(NSString *)modeStr {
+  if ([modeStr  isEqual: @"default"]) {
+    return  AVAudioSessionModeDefault;
+  }
+
+  if ([modeStr  isEqual: @"gameChat"]) {
+    return  AVAudioSessionModeGameChat;
+  }
+
+  if ([modeStr  isEqual: @"measurement"]) {
+    return  AVAudioSessionModeMeasurement;
+  }
+
+  if ([modeStr  isEqual: @"moviePlayback"]) {
+    return  AVAudioSessionModeMoviePlayback;
+  }
+
+  if ([modeStr  isEqual: @"spokenAudio"]) {
+    return  AVAudioSessionModeSpokenAudio;
+  }
+
+  if ([modeStr  isEqual: @"videoChat"]) {
+    return  AVAudioSessionModeVideoChat;
+  }
+
+  if ([modeStr  isEqual: @"videoRecording"]) {
+    return  AVAudioSessionModeVideoRecording;
+  }
+
+  if ([modeStr  isEqual: @"voiceChat"]) {
+    return  AVAudioSessionModeVoiceChat;
+  }
+
+  if ([modeStr  isEqual: @"voicePrompt"]) {
+    return  AVAudioSessionModeVoicePrompt;
+  }
+
+  return 0;
+}
+
+- (AVAudioSessionCategory) parseCategory:(NSString *)categoryStr {
+  if ([categoryStr  isEqual: @"ambient"]) {
+    return  AVAudioSessionCategoryAmbient;
+  }
+
+  if ([categoryStr  isEqual: @"multiRoute"]) {
+    return  AVAudioSessionCategoryMultiRoute;
+  }
+
+  if ([categoryStr  isEqual: @"playAndRecord"]) {
+    return  AVAudioSessionCategoryPlayAndRecord;
+  }
+
+  if ([categoryStr  isEqual: @"playback"]) {
+    return  AVAudioSessionCategoryPlayback;
+  }
+
+  if ([categoryStr  isEqual: @"record"]) {
+    return  AVAudioSessionCategoryRecord;
+  }
+
+  if ([categoryStr  isEqual: @"soloAmbient"]) {
+    return  AVAudioSessionCategorySoloAmbient;
+  }
+
+  return  0;
+}
+
+- (AVAudioSessionCategoryOptions) parseCategoryOption:(NSString *)categoryOptionStr {
+  if ([categoryOptionStr isEqual: @"mixWithOthers"]) {
+    return  AVAudioSessionCategoryOptionMixWithOthers;
+  }
+
+  if ([categoryOptionStr isEqual: @"duckOthers"]) {
+    return AVAudioSessionCategoryOptionDuckOthers;
+  }
+
+  if ([categoryOptionStr isEqual: @"interruptSpokenAudioAndMixWithOthers"]) {
+    return AVAudioSessionCategoryOptionDuckOthers;
+  }
+
+  if ([categoryOptionStr isEqual: @"allowBluetooth"]) {
+    return AVAudioSessionCategoryOptionDuckOthers;
+  }
+
+  if ([categoryOptionStr isEqual: @"allowBluetoothA2DP"]) {
+    return AVAudioSessionCategoryOptionDuckOthers;
+  }
+
+  if ([categoryOptionStr isEqual: @"allowAirPlay"]) {
+    return AVAudioSessionCategoryOptionDuckOthers;
+  }
+
+  if ([categoryOptionStr isEqual: @"defaultToSpeaker"]) {
+    return AVAudioSessionCategoryOptionDuckOthers;
+  }
+
+  if ([categoryOptionStr isEqual: @"overrideMutedMicrophoneInterruption"]) {
+    return AVAudioSessionCategoryOptionDuckOthers;
+  }
+
+  return 0;
 }
 
 @end
