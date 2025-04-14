@@ -384,7 +384,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         nb.setContentInfo(album);
         nb.setColor(notificationColor);
         nb.setColorized(false);
- 
+
         if(notificationIcon != null){
             notification.setCustomNotificationIcon(notificationIcon);
         }
@@ -493,7 +493,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
             return;
         }
 
-        if (artworkThread != null && artworkThread.isAlive()) { 
+        if (artworkThread != null && artworkThread.isAlive()) {
             artworkThread.interrupt();
         }
 
@@ -599,6 +599,26 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         if(session.isActive()) {
             notification.show(nb, isPlaying);
         }
+    }
+
+    @ReactMethod
+    synchronized public void setAudioSessionActivity(boolean enable) {
+      // Do nothing ios only
+    }
+
+    @ReactMethod
+    synchronized public void setAudioSessionOptions() {
+      // Do nothing ios only
+    }
+
+    @ReactMethod
+    synchronized public void observeOutputVolume() {
+      // TODO
+    }
+
+    @ReactMethod
+    synchronized public float getOutputVolume() {
+      return 0.0;
     }
 
     private Bitmap loadArtwork(String url, boolean local) {
