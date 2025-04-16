@@ -166,7 +166,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         context = getReactApplicationContext();
 
         emitter = new MusicControlEventEmitter(context, notificationId);
-        audioManager = (AudioManager)  context.getSystemService(Context.AUDIO_SERVICE);
+        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
         session = new MediaSessionCompat(context, "MusicControl");
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
