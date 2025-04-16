@@ -61,6 +61,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     private MusicControlReceiver receiver;
     private MusicControlEventEmitter emitter;
     private MusicControlAudioFocusListener afListener;
+    private AudioManager audioManager;
 
     private Thread artworkThread;
 
@@ -165,6 +166,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         context = getReactApplicationContext();
 
         emitter = new MusicControlEventEmitter(context, notificationId);
+        audioManager = (AudioManager)  context.getSystemService(Context.AUDIO_SERVICE);
 
         session = new MediaSessionCompat(context, "MusicControl");
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
@@ -616,9 +618,14 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
       // TODO
     }
 
-    @ReactMethod
+    @ReactMethod(isBlockingSynchronousMethod = true)
     synchronized public float getOutputVolume() {
-      return 0.0;
+      init();
+
+      int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+      int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+      return (float) currentVolume / maxVolume;
     }
 
     private Bitmap loadArtwork(String url, boolean local) {
@@ -670,7 +677,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-
+      // Nothing, ios only
     }
 
     @Override
