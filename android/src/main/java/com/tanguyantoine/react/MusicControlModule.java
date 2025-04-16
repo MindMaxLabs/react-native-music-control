@@ -615,7 +615,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     @ReactMethod
     synchronized public void observeOutputVolume() {
-      // TODO
+      // TODO: maybe some day
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
