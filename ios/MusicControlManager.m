@@ -13,6 +13,7 @@ static NSString *MusicControlObservationContext = @"MusicControlObservationConte
 @property (nonatomic, copy) NSString *artworkUrl;
 @property (nonatomic, assign) BOOL audioInterruptionsObserved;
 @property (nonatomic, assign) BOOL isReceivingRemoteControlEvents;
+@property (nonatomic, assign) BOOL isObservingOutputVolume;
 
 @end
 
