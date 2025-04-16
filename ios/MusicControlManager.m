@@ -193,13 +193,17 @@ RCT_EXPORT_METHOD(setAudioSessionActivity:(BOOL) enabled)
 
   NSLog(@"[MusicControlManager] Setting audio session as: %@", enabled ? @"active" : @"inactive");
   [audioSession setActive:enabled error:&error];
+
+  if (error != nil) {
+    RCTErrorWithMessage(error.debugDescription);
+  }
 }
 
 RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options)
 {
   NSString *modeStr = options[@"iosMode"];
   NSString *categoryStr = options[@"iosCategory"];
-  NSArray *categoryOptions = @[options[@"iosCategoryOptions"]];
+  NSArray *categoryOptions = options[@"iosCategoryOptions"];
 
   NSLog(@"Setting audio session options as %@, %@, %@", categoryStr, modeStr, categoryOptions);
 
@@ -215,6 +219,10 @@ RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options)
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
 
   [audioSession setCategory:desiredCategory mode:desiredMode options:desiredOptions error:&error];
+
+  if (error != nil) {
+    RCTErrorWithMessage(error.debugDescription);
+  }
 }
 
 RCT_EXPORT_METHOD(observeOutputVolume:(BOOL) enabled) {
@@ -222,8 +230,6 @@ RCT_EXPORT_METHOD(observeOutputVolume:(BOOL) enabled) {
     if ([self isObservingOutputVolume]) {
       return;
     }
-
-    [[AVAudioSession sharedInstance] setActive:YES error:nil];
 
     [[AVAudioSession sharedInstance] addObserver:self
                                       forKeyPath:@"outputVolume"
@@ -559,39 +565,39 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
 }
 
 - (AVAudioSessionMode) parseMode:(NSString *)modeStr {
-  if ([modeStr  isEqual: @"default"]) {
+  if ([modeStr isEqual: @"default"]) {
     return  AVAudioSessionModeDefault;
   }
 
-  if ([modeStr  isEqual: @"gameChat"]) {
+  if ([modeStr isEqual: @"gameChat"]) {
     return  AVAudioSessionModeGameChat;
   }
 
-  if ([modeStr  isEqual: @"measurement"]) {
+  if ([modeStr isEqual: @"measurement"]) {
     return  AVAudioSessionModeMeasurement;
   }
 
-  if ([modeStr  isEqual: @"moviePlayback"]) {
+  if ([modeStr isEqual: @"moviePlayback"]) {
     return  AVAudioSessionModeMoviePlayback;
   }
 
-  if ([modeStr  isEqual: @"spokenAudio"]) {
+  if ([modeStr isEqual: @"spokenAudio"]) {
     return  AVAudioSessionModeSpokenAudio;
   }
 
-  if ([modeStr  isEqual: @"videoChat"]) {
+  if ([modeStr isEqual: @"videoChat"]) {
     return  AVAudioSessionModeVideoChat;
   }
 
-  if ([modeStr  isEqual: @"videoRecording"]) {
+  if ([modeStr isEqual: @"videoRecording"]) {
     return  AVAudioSessionModeVideoRecording;
   }
 
-  if ([modeStr  isEqual: @"voiceChat"]) {
+  if ([modeStr isEqual: @"voiceChat"]) {
     return  AVAudioSessionModeVoiceChat;
   }
 
-  if ([modeStr  isEqual: @"voicePrompt"]) {
+  if ([modeStr isEqual: @"voicePrompt"]) {
     return  AVAudioSessionModeVoicePrompt;
   }
 
@@ -599,27 +605,27 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
 }
 
 - (AVAudioSessionCategory) parseCategory:(NSString *)categoryStr {
-  if ([categoryStr  isEqual: @"ambient"]) {
+  if ([categoryStr isEqual: @"ambient"]) {
     return  AVAudioSessionCategoryAmbient;
   }
 
-  if ([categoryStr  isEqual: @"multiRoute"]) {
+  if ([categoryStr isEqual: @"multiRoute"]) {
     return  AVAudioSessionCategoryMultiRoute;
   }
 
-  if ([categoryStr  isEqual: @"playAndRecord"]) {
+  if ([categoryStr isEqual: @"playAndRecord"]) {
     return  AVAudioSessionCategoryPlayAndRecord;
   }
 
-  if ([categoryStr  isEqual: @"playback"]) {
+  if ([categoryStr isEqual: @"playback"]) {
     return  AVAudioSessionCategoryPlayback;
   }
 
-  if ([categoryStr  isEqual: @"record"]) {
+  if ([categoryStr isEqual: @"record"]) {
     return  AVAudioSessionCategoryRecord;
   }
 
-  if ([categoryStr  isEqual: @"soloAmbient"]) {
+  if ([categoryStr isEqual: @"soloAmbient"]) {
     return  AVAudioSessionCategorySoloAmbient;
   }
 
@@ -636,27 +642,27 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
   }
 
   if ([categoryOptionStr isEqual: @"interruptSpokenAudioAndMixWithOthers"]) {
-    return AVAudioSessionCategoryOptionDuckOthers;
+    return AVAudioSessionCategoryOptionInterruptSpokenAudioAndMixWithOthers;
   }
 
   if ([categoryOptionStr isEqual: @"allowBluetooth"]) {
-    return AVAudioSessionCategoryOptionDuckOthers;
+    return AVAudioSessionCategoryOptionAllowBluetooth;
   }
 
   if ([categoryOptionStr isEqual: @"allowBluetoothA2DP"]) {
-    return AVAudioSessionCategoryOptionDuckOthers;
+    return AVAudioSessionCategoryOptionAllowBluetoothA2DP;
   }
 
   if ([categoryOptionStr isEqual: @"allowAirPlay"]) {
-    return AVAudioSessionCategoryOptionDuckOthers;
+    return AVAudioSessionCategoryOptionAllowAirPlay;
   }
 
   if ([categoryOptionStr isEqual: @"defaultToSpeaker"]) {
-    return AVAudioSessionCategoryOptionDuckOthers;
+    return AVAudioSessionCategoryOptionDefaultToSpeaker;
   }
 
   if ([categoryOptionStr isEqual: @"overrideMutedMicrophoneInterruption"]) {
-    return AVAudioSessionCategoryOptionDuckOthers;
+    return AVAudioSessionCategoryOptionOverrideMutedMicrophoneInterruption;
   }
 
   return 0;
