@@ -1,5 +1,5 @@
-import { Command } from './types';
-export { Command };
+import { Command, AudioSessionOptions } from "./types";
+export { Command, AudioSessionOptions };
 declare type TPlayingInfo = any;
 declare const MusicControl: {
     STATE_PLAYING: any;
@@ -25,5 +25,9 @@ declare const MusicControl: {
     off: (actionName: Command) => void;
     stopControl: () => void;
     handleAudioInterruptions: (enable: boolean) => void;
+    setAudioSessionActivity: (enable: boolean) => void;
+    setAudioSessionOptions: (options: AudioSessionOptions) => void;
+    observeOutputVolume: (enable: boolean) => void;
+    getOutputVolume: () => Promise<number>;
 };
 export default MusicControl;

@@ -61,6 +61,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     private MusicControlReceiver receiver;
     private MusicControlEventEmitter emitter;
     private MusicControlAudioFocusListener afListener;
+    private AudioManager audioManager;
 
     private Thread artworkThread;
 
@@ -165,6 +166,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         context = getReactApplicationContext();
 
         emitter = new MusicControlEventEmitter(context, notificationId);
+        audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
 
         session = new MediaSessionCompat(context, "MusicControl");
         session.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
@@ -384,7 +386,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         nb.setContentInfo(album);
         nb.setColor(notificationColor);
         nb.setColorized(false);
- 
+
         if(notificationIcon != null){
             notification.setCustomNotificationIcon(notificationIcon);
         }
@@ -493,7 +495,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
             return;
         }
 
-        if (artworkThread != null && artworkThread.isAlive()) { 
+        if (artworkThread != null && artworkThread.isAlive()) {
             artworkThread.interrupt();
         }
 
@@ -601,6 +603,31 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         }
     }
 
+    @ReactMethod
+    synchronized public void setAudioSessionActivity(boolean enable) {
+      // Do nothing ios only
+    }
+
+    @ReactMethod
+    synchronized public void setAudioSessionOptions() {
+      // Do nothing ios only
+    }
+
+    @ReactMethod
+    synchronized public void observeOutputVolume() {
+      // TODO: maybe some day
+    }
+
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    synchronized public float getOutputVolume() {
+      init();
+
+      int currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+      int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+
+      return (float) currentVolume / maxVolume;
+    }
+
     private Bitmap loadArtwork(String url, boolean local) {
         Bitmap bitmap = null;
 
@@ -650,7 +677,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
-
+      // Nothing, ios only
     }
 
     @Override
