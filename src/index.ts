@@ -39,6 +39,7 @@ const MusicControl = {
   enableBackgroundMode: function (enable: boolean) {
     NativeMusicControl.enableBackgroundMode(enable);
   },
+
   setNowPlaying: function (info: TPlayingInfo) {
     // Check if we have an android asset from react style image require
     if (info.artwork) {
@@ -47,30 +48,37 @@ const MusicControl = {
 
     NativeMusicControl.setNowPlaying(info);
   },
+
   setPlayback: function (info: TPlayingInfo): void {
     // Backwards compatibility. Use updatePlayback instead.
     NativeMusicControl.updatePlayback(info);
   },
+
   updatePlayback: function (info: TPlayingInfo): void {
     NativeMusicControl.updatePlayback(info);
   },
+
   resetNowPlaying: function () {
     NativeMusicControl.resetNowPlaying();
   },
+
   enableControl: function (controlName: string, enable: boolean, options = {}) {
     NativeMusicControl.enableControl(controlName, enable, options || {});
   },
+
   handleCommand: function (commandName: Command, value: any) {
     if (handlers[commandName]) {
       //@ts-ignore
       handlers[commandName](value);
     }
   },
+
   setNotificationId: function (notificationId: any, channelId: any) {
     if (IS_ANDROID) {
       NativeMusicControl.setNotificationIds(notificationId, channelId);
     }
   },
+
   on: function (actionName: Command, cb: (value: any) => void) {
     if (!listenerOfNativeMusicControl) {
       listenerOfNativeMusicControl = (
@@ -83,6 +91,7 @@ const MusicControl = {
     }
     handlers[actionName] = cb;
   },
+
   off: function (actionName: Command): void {
     delete handlers[actionName];
     if (!Object.keys(handlers).length && listenerOfNativeMusicControl) {
@@ -90,6 +99,7 @@ const MusicControl = {
       listenerOfNativeMusicControl = null;
     }
   },
+
   stopControl: function (): void {
     if (listenerOfNativeMusicControl) {
       listenerOfNativeMusicControl.remove();
@@ -101,18 +111,27 @@ const MusicControl = {
     });
     NativeMusicControl.stopControl();
   },
+
   handleAudioInterruptions: function (enable: boolean): void {
     NativeMusicControl.observeAudioInterruptions(enable);
   },
-  setAudioSessionActivity: function (enable: boolean): void {
-    NativeMusicControl.setAudioSessionActivity(enable);
+
+  setAudioSessionActivity: function (enable: boolean): boolean {
+    const result = NativeMusicControl.setAudioSessionActivity(enable);
+
+    return result === "true";
   },
-  setAudioSessionOptions: function (options: AudioSessionOptions): void {
-    NativeMusicControl.setAudioSessionOptions(options);
+
+  setAudioSessionOptions: function (options: AudioSessionOptions): boolean {
+    const result = NativeMusicControl.setAudioSessionOptions(options);
+
+    return result === "true";
   },
+
   observeOutputVolume: function (enable: boolean): void {
     NativeMusicControl.observeOutputVolume(enable);
   },
+
   getOutputVolume: function (): Promise<number> {
     return NativeMusicControl.getOutputVolume();
   },

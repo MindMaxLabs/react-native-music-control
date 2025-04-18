@@ -603,14 +603,16 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         }
     }
 
-    @ReactMethod
-    synchronized public void setAudioSessionActivity(boolean enable) {
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    synchronized public String setAudioSessionActivity(boolean enable) {
       // Do nothing ios only
+      return "true";
     }
 
-    @ReactMethod
-    synchronized public void setAudioSessionOptions() {
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    synchronized public String setAudioSessionOptions() {
       // Do nothing ios only
+      return "true";
     }
 
     @ReactMethod

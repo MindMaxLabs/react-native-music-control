@@ -25,8 +25,8 @@ declare const MusicControl: {
     off: (actionName: Command) => void;
     stopControl: () => void;
     handleAudioInterruptions: (enable: boolean) => void;
-    setAudioSessionActivity: (enable: boolean) => void;
-    setAudioSessionOptions: (options: AudioSessionOptions) => void;
+    setAudioSessionActivity: (enable: boolean) => boolean;
+    setAudioSessionOptions: (options: AudioSessionOptions) => boolean;
     observeOutputVolume: (enable: boolean) => void;
     getOutputVolume: () => Promise<number>;
 };

@@ -186,7 +186,7 @@ RCT_EXPORT_METHOD(enableControl:(NSString *) controlName enabled:(BOOL) enabled 
     }
 }
 
-RCT_EXPORT_METHOD(setAudioSessionActivity:(BOOL) enabled)
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(setAudioSessionActivity:(BOOL) enabled)
 {
   NSError *error;
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
@@ -196,10 +196,14 @@ RCT_EXPORT_METHOD(setAudioSessionActivity:(BOOL) enabled)
 
   if (error != nil) {
     RCTErrorWithMessage(error.debugDescription);
+
+    return @"false";
   }
+
+  return @"true";
 }
 
-RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options)
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(setAudioSessionOptions:(NSDictionary *)options)
 {
   NSString *modeStr = options[@"iosMode"];
   NSString *categoryStr = options[@"iosCategory"];
@@ -222,7 +226,10 @@ RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options)
 
   if (error != nil) {
     RCTErrorWithMessage(error.debugDescription);
+    return @"false";
   }
+
+  return @"true";
 }
 
 RCT_EXPORT_METHOD(observeOutputVolume:(BOOL) enabled) {
@@ -500,6 +507,7 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
     reasonStr = @"CategoryChange";
     NSString *category = [[AVAudioSession sharedInstance] category];
     NSString *mode = [[AVAudioSession sharedInstance] mode];
+    NSString *sampleRate = [[NSNumber numberWithDouble:[[AVAudioSession sharedInstance] sampleRate]] stringValue];
 
     [self sendEventWithName:@"RNMusicControlEvent"
                        body:@{
@@ -507,7 +515,8 @@ RCT_EXPORT_METHOD(observeAudioInterruptions:(BOOL) observe){
       @"value": @{
         @"reason": reasonStr,
         @"iosCategory": category,
-        @"iosMode": mode
+        @"iosMode": mode,
+        @"sampleRate": sampleRate,
       }
     }];
     return;
