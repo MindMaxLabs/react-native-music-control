@@ -610,7 +610,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     }
 
     @ReactMethod(isBlockingSynchronousMethod = true)
-    synchronized public String setAudioSessionOptions() {
+    synchronized public String setAudioSessionOptions(ReadableMap options) {
       // Do nothing ios only
       return "true";
     }
