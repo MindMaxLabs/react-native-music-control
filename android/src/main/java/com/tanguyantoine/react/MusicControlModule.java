@@ -603,16 +603,16 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
         }
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    synchronized public String setAudioSessionActivity(boolean enable) {
+    @ReactMethod
+    synchronized public String setAudioSessionActivity(boolean enable, Promise promise) {
       // Do nothing ios only
-      return "true";
+      Promise.resolve("true")
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
-    synchronized public String setAudioSessionOptions(ReadableMap options) {
+    @ReactMethod
+    synchronized public String setAudioSessionOptions(ReadableMap options, Promise promise) {
       // Do nothing ios only
-      return "true";
+      Promise.resolve("true")
     }
 
     @ReactMethod
@@ -620,7 +620,7 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
       // TODO: maybe some day
     }
 
-    @ReactMethod(isBlockingSynchronousMethod = true)
+    @ReactMethod
     synchronized public float getOutputVolume() {
       init();
 

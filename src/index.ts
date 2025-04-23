@@ -17,6 +17,7 @@ import { Command, AudioSessionOptions } from "./types";
 export { Command, AudioSessionOptions };
 
 const NativeMusicControl = NativeModules.MusicControlManager;
+
 let handlers: { [key in Command]?: (value: any) => void } = {};
 let listenerOfNativeMusicControl: any = null;
 const IS_ANDROID = Platform.OS === "android";
@@ -116,14 +117,16 @@ const MusicControl = {
     NativeMusicControl.observeAudioInterruptions(enable);
   },
 
-  setAudioSessionActivity: function (enable: boolean): boolean {
-    const result = NativeMusicControl.setAudioSessionActivity(enable);
+  setAudioSessionActivity: async function (enable: boolean): Promise<boolean> {
+    const result = await NativeMusicControl.setAudioSessionActivity(enable);
 
     return result === "true";
   },
 
-  setAudioSessionOptions: function (options: AudioSessionOptions): boolean {
-    const result = NativeMusicControl.setAudioSessionOptions(options);
+  setAudioSessionOptions: async function (
+    options: AudioSessionOptions
+  ): Promise<boolean> {
+    const result = await NativeMusicControl.setAudioSessionOptions(options);
 
     return result === "true";
   },
