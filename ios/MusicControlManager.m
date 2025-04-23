@@ -186,10 +186,7 @@ RCT_EXPORT_METHOD(enableControl:(NSString *) controlName enabled:(BOOL) enabled 
     }
 }
 
-RCT_EXPORT_METHOD(
-  setAudioSessionActivity:(BOOL) enabled
-  resolver:(RCTPromiseResolveBlock)resolve
-)
+RCT_EXPORT_METHOD(setAudioSessionActivity:(BOOL) enabled resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   NSError *error;
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
@@ -206,10 +203,7 @@ RCT_EXPORT_METHOD(
   return resolve(@"true");
 }
 
-RCT_EXPORT_METHOD(
-  setAudioSessionOptions:(NSDictionary *)options
-  resolver:(RCTPromiseResolveBlock)resolve
-)
+RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
 {
   NSString *modeStr = options[@"iosMode"];
   NSString *categoryStr = options[@"iosCategory"];
@@ -262,7 +256,7 @@ RCT_EXPORT_METHOD(observeOutputVolume:(BOOL) enabled) {
   }
 }
 
-RCT_EXPORT_METHOD(getOutputVolume:(RCTPromiseResolveBlock)resolve) {
+RCT_EXPORT_METHOD(getOutputVolume:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject) {
   resolve([NSNumber numberWithDouble: [[AVAudioSession sharedInstance] outputVolume]]);
 }
 
