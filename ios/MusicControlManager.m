@@ -207,7 +207,7 @@ RCT_EXPORT_METHOD(
 }
 
 RCT_EXPORT_METHOD(
-  setAudioSessionOptions:(NSDictionary *)
+  setAudioSessionOptions:(NSDictionary *)options
   resolver:(RCTPromiseResolveBlock)resolve
 )
 {
