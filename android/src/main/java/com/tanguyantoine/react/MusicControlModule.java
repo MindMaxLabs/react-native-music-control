@@ -606,13 +606,13 @@ public class MusicControlModule extends ReactContextBaseJavaModule implements Co
     @ReactMethod
     synchronized public String setAudioSessionActivity(boolean enable, Promise promise) {
       // Do nothing ios only
-      Promise.resolve("true")
+      Promise.resolve("true");
     }
 
     @ReactMethod
     synchronized public String setAudioSessionOptions(ReadableMap options, Promise promise) {
       // Do nothing ios only
-      Promise.resolve("true")
+      Promise.resolve("true");
     }
 
     @ReactMethod
