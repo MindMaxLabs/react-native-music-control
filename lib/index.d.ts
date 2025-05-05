@@ -1,6 +1,15 @@
+import constants from "./constants";
 import { Command, AudioSessionOptions } from "./types";
 export { Command, AudioSessionOptions };
-declare type TPlayingInfo = any;
+declare type TPlayingInfo = {
+    title?: string;
+    elapsedTime: number;
+    artwork?: string | number;
+    artist?: string;
+    state: constants.STATE_BUFFERING | constants.STATE_PLAYING | constants.STATE_PAUSED | constants.STATE_STOPPED | constants.STATE_ERROR;
+    duration?: number;
+    description?: string;
+};
 declare const MusicControl: {
     STATE_PLAYING: any;
     STATE_PAUSED: any;

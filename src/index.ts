@@ -21,7 +21,21 @@ const NativeMusicControl = NativeModules.MusicControlManager;
 let handlers: { [key in Command]?: (value: any) => void } = {};
 let listenerOfNativeMusicControl: any = null;
 const IS_ANDROID = Platform.OS === "android";
-type TPlayingInfo = any;
+
+type TPlayingInfo = {
+  title?: string;
+  elapsedTime: number;
+  artwork?: string | number;
+  artist?: string;
+  state:
+    | constants.STATE_BUFFERING
+    | constants.STATE_PLAYING
+    | constants.STATE_PAUSED
+    | constants.STATE_STOPPED
+    | constants.STATE_ERROR;
+  duration?: number;
+  description?: string;
+};
 
 const MusicControl = {
   STATE_PLAYING: constants.STATE_PLAYING,

@@ -88,6 +88,7 @@ RCT_EXPORT_METHOD(updatePlayback:(NSDictionary *) originalDetails)
 
         [details setValue:speed forKey:MEDIA_SPEED];
     }
+
     if ([state isEqual:MEDIA_STATE_STOPPED]) {
         MPRemoteCommandCenter *remoteCenter = [MPRemoteCommandCenter sharedCommandCenter];
         [self toggleHandler:remoteCenter.stopCommand withSelector:@selector(onStop:) enabled:false];
@@ -195,12 +196,13 @@ RCT_EXPORT_METHOD(setAudioSessionActivity:(BOOL) enabled resolve:(RCTPromiseReso
   [audioSession setActive:enabled error:&error];
 
   if (error != nil) {
+    NSLog(@"[MusicControlManager] Error setting audio session activity: %@", [error debugDescription]);
     RCTErrorWithMessage(error.debugDescription);
-
     resolve(@"false");
+    return;
   }
 
-  return resolve(@"true");
+  resolve(@"true");
 }
 
 RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options resolve:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromiseRejectBlock)reject)
@@ -225,11 +227,13 @@ RCT_EXPORT_METHOD(setAudioSessionOptions:(NSDictionary *)options resolve:(RCTPro
   [audioSession setCategory:desiredCategory mode:desiredMode options:desiredOptions error:&error];
 
   if (error != nil) {
+    NSLog(@"[MusicControlManager] Error setting audio session options: %@", [error debugDescription]);
     RCTErrorWithMessage(error.debugDescription);
     resolve(@"false");
+    return;
   }
 
-  return resolve(@"true");
+  resolve(@"true");
 }
 
 RCT_EXPORT_METHOD(observeOutputVolume:(BOOL) enabled) {
