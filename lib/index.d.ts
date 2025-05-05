@@ -6,7 +6,7 @@ declare type TPlayingInfo = {
     elapsedTime: number;
     artwork?: string | number;
     artist?: string;
-    state: constants.STATE_BUFFERING | constants.STATE_PLAYING | constants.STATE_PAUSED | constants.STATE_STOPPED | constants.STATE_ERROR;
+    state?: constants.STATE_BUFFERING | constants.STATE_PLAYING | constants.STATE_PAUSED | constants.STATE_STOPPED | constants.STATE_ERROR;
     duration?: number;
     description?: string;
 };

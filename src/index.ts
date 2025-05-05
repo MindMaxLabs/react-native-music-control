@@ -27,7 +27,7 @@ type TPlayingInfo = {
   elapsedTime: number;
   artwork?: string | number;
   artist?: string;
-  state:
+  state?:
     | constants.STATE_BUFFERING
     | constants.STATE_PLAYING
     | constants.STATE_PAUSED
